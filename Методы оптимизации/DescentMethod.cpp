@@ -61,7 +61,7 @@ vector<double> DescentMethod::calculateMinimum(const Func& func, vector<double> 
 				newGrad[i] -= a * grad[i];
 			}
 			return func(newGrad);
-		};  
+		};
 
 		vector<pair<double, bool>> possResults {Extremum::calculateExtremum(funcNext)};
 		double a{ possResults[0].first };
