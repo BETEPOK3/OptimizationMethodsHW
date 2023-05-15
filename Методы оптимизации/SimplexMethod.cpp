@@ -1,11 +1,11 @@
 #include "SimplexMethod.h"
+#include "Printer.h"
 #include <iostream>
 #include <iomanip>
 #include <format>
+#include <algorithm>
 
-#define CELL_CONFIG std::right << std::setw(8)
-
-std::pair<VectorIdx, Matrix> SimplexMethod::createTable(
+Matrix SimplexMethod::createTable(
 	const Vector& coefsEq, 
 	const Matrix& coefsMatrix, 
 	const Vector& point)
@@ -45,37 +45,10 @@ std::pair<VectorIdx, Matrix> SimplexMethod::createTable(
 	}
 
 #ifndef NDEBUG
-	printTable(varsIdx, table, coefsEq);
+	Printer::printSimplexTable(varsIdx, table, coefsEq);
 #endif
 
-	return { varsIdx, table };
-}
-
-void SimplexMethod::printTable(
-	const VectorIdx& varsIdx,
-	const Matrix& table,
-	const Vector& coefsEq)
-{
-	std::cout << '\n' << CELL_CONFIG << "Basis"
-		<< CELL_CONFIG << 'c'
-		<< CELL_CONFIG << "_x_";
-	for (size_t j = 0; j < coefsEq.size(); ++j)
-		std::cout << CELL_CONFIG << coefsEq[j];
-	std::cout << '\n';
-	for (size_t i = 0; i < table.size() - 2; ++i) {
-		std::cout << CELL_CONFIG << std::format("x{}", varsIdx[i] + 1);
-		for (size_t j = 0; j < table[0].size(); ++j) {
-			std::cout << CELL_CONFIG << table[i][j];
-		}
-		std::cout << '\n';
-	}
-	std::cout << CELL_CONFIG << 'z' << CELL_CONFIG << ' ';
-	for (size_t j = 1; j < table[0].size(); ++j)
-		std::cout << CELL_CONFIG << table[table.size() - 2][j];
-	std::cout << '\n' << CELL_CONFIG << "delta" << CELL_CONFIG << ' ' << CELL_CONFIG << ' ';
-	for (size_t j = 2; j < table[0].size(); ++j)
-		std::cout << CELL_CONFIG << table[table.size() - 1][j];
-	std::cout << '\n';
+	return table;
 }
 
 Matrix SimplexMethod::recreateTable(
@@ -119,13 +92,74 @@ Matrix SimplexMethod::recreateTable(
 	return newTable;
 }
 
+Matrix SimplexMethod::gauss(
+	const Matrix& coefsMatrix,
+	const VectorIdx& varsIdx)
+{
+	if (coefsMatrix.size() != varsIdx.size()) {
+		throw std::runtime_error("–азмер системы уравнений должен совпадать с кол-вом выражаемых переменных.");
+	}
+	Matrix newMatrix = coefsMatrix;
+	
+	// —оответствие выражаемых переменных и уравнений, в которых они будут выражены
+	// TODO: нет защиты от возможных ошибок
+	VectorIdx eqIdx(varsIdx.size());
+	size_t nextIdx = 0;
+	for (size_t idx = 0; idx < eqIdx.size(); ++idx) {
+		if (nextIdx >= newMatrix.size()) {
+			throw std::runtime_error("TODO: ћетод √аусса");
+		}
+		while (newMatrix[nextIdx][varsIdx[nextIdx]] == 0) {
+			++nextIdx;
+			if (nextIdx >= newMatrix.size()) {
+				throw std::runtime_error("TODO: ћетод √аусса");
+			}
+		}
+		eqIdx[idx] = nextIdx;
+		++nextIdx;
+	}
+
+	// ¬ыражение переменных в системе
+	for (size_t idx = 0; idx < eqIdx.size(); ++idx) {
+		Vector& eq = newMatrix[eqIdx[idx]];
+
+		// ƒеление всех переменных в уравнении на базисную
+		double basisNum = eq[varsIdx[idx]];
+		std::for_each(eq.begin(), eq.end(), [&basisNum](double& num) {
+			num /= basisNum;
+			});
+
+		// ¬ычитание из всех остальных уравнений текущего так, чтобы
+		// во всех остальных уравнени€х эта базисна€ переменна€ была равна 0
+		for (size_t idx2 = 0; idx2 < eqIdx.size(); ++idx2) {
+			if (idx2 != idx) {
+				double mult = newMatrix[idx2][varsIdx[idx]] / eq[varsIdx[idx]];
+				for (size_t idx3 = 0; idx3 < eq.size(); ++idx3) {
+					newMatrix[idx2][idx3] -= eq[idx3] * mult;
+				}
+			}
+		}
+	}
+
+	return newMatrix;
+}
+
 std::pair<Vector, bool> SimplexMethod::calculate(
 	const Vector& coefsEq, 
 	const Matrix& coefsMatrix,
 	const Vector& point)
 {
+	// ¬ыражение базисных переменных
+	VectorIdx varsIdx;
+	for (size_t j = 0; j < point.size(); ++j) {
+		if (point[j] != 0) {
+			varsIdx.push_back(j);
+		}
+	}
+	const Matrix newMatrix = gauss(coefsMatrix, varsIdx);
+
 	// —оздание симплексной таблицы
-	auto [varsIdx, table] = createTable(coefsEq, coefsMatrix, point);
+	Matrix table = createTable(coefsEq, newMatrix, point);
 	const size_t colCount = table[0].size();
 
 	// –ешение симплексным методом
@@ -164,7 +198,7 @@ std::pair<Vector, bool> SimplexMethod::calculate(
 		}
 
 #ifndef NDEBUG
-		printTable(varsIdx, table, coefsEq);
+		Printer::printSimplexTable(varsIdx, table, coefsEq);
 #endif
 
 	} while (true);

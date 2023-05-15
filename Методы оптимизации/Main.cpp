@@ -15,23 +15,16 @@ int main() {
 	std::ios_base::sync_with_stdio(false);
 	std::setlocale(0, "");
 
-	Vector eq0 = { 2, 1, 1, -1 };
-	Matrix sys0 = {
-		{1, -1, 1, 0},
-		{2, 1, 0, 1}
-	};
-	Vector point0 = { 0,0,1,3 };
-
 	Vector eq1 = { -2, -1, -1, -7, 2 };
 	Matrix sys1 = {
-		{1, 1, -1, 1, 0},
-		{2, 1, 1, 0, -1},
-		{1, 2, 1, -7, 1}
+		{1, 1, -1, 1, 0, 1},
+		{2, 1, 1, 0, -1, 7},
+		{1, 2, 1, -7, 1, 6}
 	};
 	Vector point1 = { 2,1,2,0,0 };
 
 	std::pair<Vector, bool> result;
 	std::cout << "Задача 1: \n";
-	result = SimplexMethod::calculate(eq0, sys0, point0);
+	result = SimplexMethod::calculate(eq1, sys1, point1);
 	prettyPrint(result.first, result.second);
 }

@@ -2,10 +2,7 @@
 #define __H_SIMPLEX_METHOD_H__
 
 #include <vector>
-
-using VectorIdx = std::vector<size_t>;
-using Vector = std::vector<double>;
-using Matrix = std::vector<Vector>;
+#include "Printer.h"
 
 class SimplexMethod {
 	SimplexMethod() = delete;
@@ -17,21 +14,10 @@ class SimplexMethod {
 	/// <param name="coefsMatrix">Коэффициенты системы уравнений</param>
 	/// <param name="point">Угловая точка</param>
 	/// <returns>Вектор индексов базисов и таблица</returns>
-	static std::pair<VectorIdx, Matrix> createTable(
+	static Matrix createTable(
 		const Vector& coefsEq,
 		const Matrix& coefsMatrix,
 		const Vector& point);
-
-	/// <summary>
-	/// Выводит симплексную таблицу на экран
-	/// </summary>
-	/// <param name="varsIdx">Веткор индексов базисов</param>
-	/// <param name="table">Симплексная таблица</param>
-	/// <param name="coefsEq">Коэффициенты целевой функции</param>
-	static void printTable(
-		const VectorIdx& varsIdx,
-		const Matrix& table,
-		const Vector& coefsEq);
 
 	/// <summary>
 	/// Создание новой таблицы на основе разрешающего элемента
@@ -46,6 +32,17 @@ class SimplexMethod {
 		const Vector& coefsEq,
 		const size_t& i0,
 		const size_t& j0
+	);
+
+	/// <summary>
+	/// Решение системы уравнений методом Гаусса
+	/// </summary>
+	/// <param name="coefsMatrix">Расширенная матрица системы</param>
+	/// <param name="varsIdx">Индексы переменных, которые нужно найти</param>
+	/// <returns>Решённая расширенная матрица системы</returns>
+	static Matrix gauss(
+		const Matrix& coefsMatrix,
+		const VectorIdx& varsIdx
 	);
 
 public:
