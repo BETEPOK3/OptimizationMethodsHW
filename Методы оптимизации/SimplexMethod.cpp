@@ -230,3 +230,32 @@ std::pair<Vector, bool> SimplexMethod::calculate(
 
 	return { {}, true };
 }
+
+std::pair<Vector, bool> SimplexMethod::calculate(
+	const Vector& coefsEq, 
+	const Matrix& coefsMatrix)
+{
+	// Метод искусственного базиса
+	Vector newCoefsEq = Vector(coefsEq.size());
+	Matrix newCoefsMatrix = coefsMatrix;
+	Vector newPoint(coefsEq.size());
+	for (size_t j = 0; j < coefsMatrix.size(); ++j) {
+		newCoefsEq.push_back(-1);
+		newPoint.push_back(coefsMatrix[j].back());
+		for (size_t j1 = 0; j1 < coefsMatrix.size(); ++j1) {
+			if (j1 == j) {
+				newCoefsMatrix[j].insert(newCoefsMatrix[j].end() - 1, 1);
+			}
+			else {
+				newCoefsMatrix[j].insert(newCoefsMatrix[j].end() - 1, 0);
+			}
+		}
+	}
+	const auto [point, isInf] = calculate(newCoefsEq, newCoefsMatrix, newPoint);
+	if (isInf) {
+		return { {}, isInf };
+	}
+
+	// Решение исходной задачи
+	return calculate(coefsEq, coefsMatrix, point);
+}

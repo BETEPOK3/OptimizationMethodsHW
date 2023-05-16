@@ -58,6 +58,6 @@ void Printer::printSimplexResult(
 		for (size_t j = 0; j < coefsEq.size(); ++j) {
 			z += coefsEq[j] * result.first[j];
 		}
-		std::cout << '\n' << "Значение функции: " << z << '\n';
+		std::cout << '\n' << "Значение функции: " << z << "\n\n";
 	}
 }

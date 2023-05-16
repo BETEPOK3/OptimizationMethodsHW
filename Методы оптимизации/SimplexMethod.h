@@ -1,7 +1,6 @@
 #ifndef __H_SIMPLEX_METHOD_H__
 #define __H_SIMPLEX_METHOD_H__
 
-#include <vector>
 #include "Printer.h"
 
 class SimplexMethod {
@@ -52,11 +51,21 @@ public:
 	/// <param name="coefsEq">Коэффициенты функции</param>
 	/// <param name="coefsMatrix">Коэффициенты системы уравнений</param>
 	/// <param name="point">Угловая точка</param>
-	/// <returns>Пара <максимальное значение, если есть; бесконечен ли результат></returns>
+	/// <returns>Пара максимальное значение, если есть; бесконечен ли результат</returns>
 	static std::pair<Vector, bool> calculate(
 		const Vector& coefsEq, 
 		const Matrix& coefsMatrix, 
 		const Vector& point);
+
+	/// <summary>
+	/// Решение задачи линейного программирования в канонической виде симплекс методом без угловой точки
+	/// </summary>
+	/// <param name="coefsEq">Коэффициенты функции</param>
+	/// <param name="coefsMatrix">Коэффициенты системы уравнений</param>
+	/// <returns>Пара максимальное значение, если есть; бесконечен ли результат</returns>
+	static std::pair<Vector, bool> calculate(
+		const Vector& coefsEq,
+		const Matrix& coefsMatrix);
 };
 
 #endif
