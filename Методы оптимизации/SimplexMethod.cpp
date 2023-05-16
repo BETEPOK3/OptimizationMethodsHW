@@ -4,6 +4,7 @@
 #include <iomanip>
 #include <format>
 #include <algorithm>
+#include <unordered_map>
 
 Matrix SimplexMethod::createTable(
 	const Vector& coefsEq, 
@@ -102,44 +103,68 @@ Matrix SimplexMethod::gauss(
 	Matrix newMatrix = coefsMatrix;
 	
 	// —оответствие выражаемых переменных и уравнений, в которых они будут выражены
-	// TODO: нет защиты от возможных ошибок
-	VectorIdx eqIdx(varsIdx.size());
-	size_t nextIdx = 0;
-	for (size_t idx = 0; idx < eqIdx.size(); ++idx) {
-		if (nextIdx >= newMatrix.size()) {
-			throw std::runtime_error("TODO: ћетод √аусса");
-		}
-		while (newMatrix[nextIdx][varsIdx[nextIdx]] == 0) {
-			++nextIdx;
-			if (nextIdx >= newMatrix.size()) {
-				throw std::runtime_error("TODO: ћетод √аусса");
+	std::unordered_map<size_t, size_t> mapEqIdx;
+	size_t j = 0;
+	bool cycle = true;
+	while (mapEqIdx.size() != varsIdx.size()) {
+		// ѕервый проход (игнорирование зан€тых позиций)
+		for (size_t nextIdx = 0; nextIdx < coefsMatrix.size(); ++nextIdx) {
+			if (coefsMatrix[nextIdx][varsIdx[j]] != 0 && mapEqIdx.find(nextIdx) == mapEqIdx.end()) {
+				if (nextIdx != j) {
+					swap(newMatrix[j], newMatrix[nextIdx]);
+				}
+				mapEqIdx[j] = varsIdx[j];
+				cycle = false;
+				break;
 			}
 		}
-		eqIdx[idx] = nextIdx;
-		++nextIdx;
+
+		// ¬торой проход (принудительное замещение)
+		if (cycle) {
+			for (size_t nextIdx = 0; nextIdx < coefsMatrix.size(); ++nextIdx) {
+				if (coefsMatrix[nextIdx][varsIdx[j]] != 0) {
+					if (nextIdx != j) {
+						swap(newMatrix[j], newMatrix[nextIdx]);
+					}
+					mapEqIdx[j] = varsIdx[j];
+					break;
+				}
+			}
+		}
+
+		// ѕодготовка к следующему шагу
+		++j;
+		if (j >= varsIdx.size()) {
+			j = 0;
+		}
+		cycle = true;
 	}
 
 	// ¬ыражение переменных в системе
-	for (size_t idx = 0; idx < eqIdx.size(); ++idx) {
-		Vector& eq = newMatrix[eqIdx[idx]];
+	for (const auto& [eqIdx, varIdx] : mapEqIdx) {
+		Vector& eq = newMatrix[eqIdx];
 
 		// ƒеление всех переменных в уравнении на базисную
-		double basisNum = eq[varsIdx[idx]];
+		double basisNum = eq[varIdx];
 		std::for_each(eq.begin(), eq.end(), [&basisNum](double& num) {
 			num /= basisNum;
 			});
 
 		// ¬ычитание из всех остальных уравнений текущего так, чтобы
 		// во всех остальных уравнени€х эта базисна€ переменна€ была равна 0
-		for (size_t idx2 = 0; idx2 < eqIdx.size(); ++idx2) {
-			if (idx2 != idx) {
-				double mult = newMatrix[idx2][varsIdx[idx]] / eq[varsIdx[idx]];
+		for (size_t idx2 = 0; idx2 < coefsMatrix.size(); ++idx2) {
+			if (idx2 != eqIdx) {
+				double mult = newMatrix[idx2][varIdx] / eq[varIdx];
 				for (size_t idx3 = 0; idx3 < eq.size(); ++idx3) {
 					newMatrix[idx2][idx3] -= eq[idx3] * mult;
 				}
 			}
 		}
 	}
+
+#ifndef NDEBUG
+	Printer::printMatrix(newMatrix);
+#endif
 
 	return newMatrix;
 }

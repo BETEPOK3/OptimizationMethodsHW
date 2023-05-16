@@ -22,9 +22,21 @@ public:
 		const Matrix& table,
 		const Vector& coefsEq);
 
+	/// <summary>
+	/// Вывести на экран матрицу
+	/// </summary>
+	/// <param name="matrix"></param>
 	static void printMatrix(
-		const Matrix& system
-	);
+		const Matrix& matrix);
+
+	/// <summary>
+	/// Вывести на экран результат решения симплексным методом
+	/// </summary>
+	/// <param name="coefsEq">Целевая функция</param>
+	/// <param name="result">Результат</param>
+	static void printSimplexResult(
+		const Vector& coefsEq,
+		const std::pair<Vector, bool>& result);
 };
 
 #endif

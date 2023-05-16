@@ -32,13 +32,32 @@ void Printer::printSimplexTable(
 	std::cout << '\n';
 }
 
-void Printer::printMatrix(const Matrix& system)
+void Printer::printMatrix(const Matrix& matrix)
 {
 	std::cout << '\n';
-	for (const Vector& eq : system) {
+	for (const Vector& eq : matrix) {
 		for (const double& num : eq) {
 			std::cout << CELL_CONFIG << num;
 		}
 		std::cout << '\n';
+	}
+}
+
+void Printer::printSimplexResult(
+	const Vector& coefsEq,
+	const std::pair<Vector, bool>& result)
+{
+	std::cout << "Ответ: ";
+	if (result.second) {
+		std::cout << "Infinity\n\n";
+	}
+	else {
+		std::copy(result.first.begin(), result.first.end(), 
+			std::ostream_iterator<double>(std::cout, " "));
+		double z = 0;
+		for (size_t j = 0; j < coefsEq.size(); ++j) {
+			z += coefsEq[j] * result.first[j];
+		}
+		std::cout << '\n' << "Значение функции: " << z << '\n';
 	}
 }
