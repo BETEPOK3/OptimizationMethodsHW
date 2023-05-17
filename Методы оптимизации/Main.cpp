@@ -43,8 +43,7 @@ int main() {
 	};
 	Vector point44 = { 0, 0, 1, 1 };
 	Printer::printSimplexResult(eq44, SimplexMethod::calculate(eq44, sys44, point44));
-
-	/*
+	
 	std::cout << "Симплекс. Задача 5.2: \n";
 	Vector eq52 = { 1, 1, 1, 1 };
 	Matrix sys52 = {
@@ -52,7 +51,17 @@ int main() {
 		{5, 3, 6, -2, 5},
 		{3, 2, 4, -1, 4}
 	};
-	Printer::printSimplexResult(eq52, SimplexMethod::calculate(eq52, sys52));*/
+	Printer::printSimplexResult(eq52, SimplexMethod::calculate(eq52, sys52));
+
+	std::cout << "Симплекс. Задача 5.3: \n";
+	Vector eq53 = { 2, -1, 1, 0, -1, 0, 0 };
+	Matrix sys53 = {
+		{0, -2, 0, 1, 1, 0, 0, -3},
+		{0, 0, 1, -2, 0, 0, 0, 2},
+		{1, 3, 0, -1, 0, 1, 0, 5},
+		{-1, -1, 0, 0, 0, 0, 1, 3}
+	};
+	Printer::printSimplexResult(eq53, SimplexMethod::calculate(eq53, sys53));
 
 	/*
 	std::cout << "Транспортная. Задача 1: \n";

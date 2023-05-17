@@ -198,7 +198,9 @@ std::pair<Vector, bool> SimplexMethod::calculate(
 			// Поиск разрешающей строки
 			size_t i0 = 0;
 			for (size_t i = 1; i < table.size() - 2; ++i) {
-				if (table[i][j0] > table[i0][j0]) {
+				if (table[i][j0] > table[i0][j0] || 
+					abs(table[i][j0] - table[i0][j0]) < 0.0001 && 
+					varsIdx[i] > varsIdx[i0]) {
 					i0 = i;
 				}
 			}

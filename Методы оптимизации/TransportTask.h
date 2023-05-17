@@ -13,7 +13,9 @@ class TransportTask {
 	/// <param name="out">Откуда везём</param>
 	/// <param name="in">Куда</param>
 	/// <returns>false - не является</returns>
-	bool checkCondition(const Vector& eq, const Vector& out, const Vector& in);
+	static bool checkCondition(const Vector& eq, const Vector& out, const Vector& in);
+
+	static Matrix createPayMatrix();
 
 public:
 
